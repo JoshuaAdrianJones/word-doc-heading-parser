@@ -1,9 +1,7 @@
 # read docx file into headers
-
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List
-
 from docx import Document
 from openpyxl import Workbook
 
@@ -31,14 +29,10 @@ class Header:
 
 if __name__ == "__main__":
     input_file = Path("tests", "fixtures", "parser_test.docx")
-
     project_document = WordDocument.make(input_file)
     word_document = Document(project_document.path)
-
     content = word_document.paragraphs
     headers = [para for para in content if para.style.name.startswith("Heading")]
-
-    # Create a dictionary to store the headers and their levels
     list_of_headers = []
     for i, header in enumerate(reversed(headers)):
         header_type = header.style.name
@@ -51,7 +45,6 @@ if __name__ == "__main__":
                 level = 3
             case _:
                 level = 0
-
         list_of_headers.append(Header(level=level, text=header.text))
 
     def build_header_hierarchy(headers: List[Header]) -> Header:
@@ -75,8 +68,6 @@ if __name__ == "__main__":
 
     root_header = build_header_hierarchy(list_of_headers)
 
-    print(root_header.text)
-
     def flatten_root(root_header: Header) -> list[str]:
         headers_list = []
         for child in root_header.children:
@@ -99,5 +90,4 @@ if __name__ == "__main__":
     ws.append(["Level", "Heading"])
     for head in flatten_root(root_header=root_header):
         ws.append([head[0], head[1]])
-
     wb.save("output.xlsx")
